@@ -28,6 +28,25 @@ public class GraphNode {
         }
     }
 
+    public void resetBeconNumbers(){
+        if(!name.equals("Kevin Bacon")) throw new IllegalArgumentException("Called on " + name);
+
+        Queue<GraphNode> q = new LinkedList<>();
+        this.setBeaconNumber(-1);
+        q.add(this);
+        while(!q.isEmpty()){
+            GraphNode n = q.poll();
+            Set<GraphNode> unvisitedNodes = n.costarSet.stream().filter(i->i.getBeaconNumber()!=-1).collect(Collectors.toSet());
+            unvisitedNodes.forEach(i->i.setBeaconNumber(-1));
+            q.addAll(unvisitedNodes);
+        }
+    }
+
+    @Override
+    public String toString(){
+        return String.format("[%s %d]",name,beaconNumber);
+    }
+
     public void setBeaconNumbers(){
         if(!name.equals("Kevin Bacon")) throw new IllegalArgumentException("Called on " + name);
 
@@ -37,11 +56,11 @@ public class GraphNode {
         int currentNumber = 0;
         while(!q.isEmpty()){
             GraphNode n = q.poll();
-            Set<GraphNode> unvisitedNodes = n.costarSet.stream().filter(i->i.getBeaconNumber()==-1).collect(Collectors.toSet());
-            final int currentNumberFinal = currentNumber + 1;
-            unvisitedNodes.forEach(i->i.setBeaconNumber(currentNumberFinal));
-            q.addAll(unvisitedNodes);
-            ++currentNumber;
+            final int currentNumberFinal = n.getBeaconNumber() + 1;
+            n.costarSet.stream().filter(i->i.getBeaconNumber()==-1).forEach(i->{
+                i.setBeaconNumber(currentNumberFinal);
+                q.add(i);
+            });
         }
     }
 
@@ -88,6 +107,12 @@ public class GraphNode {
         assertEquals(1,jl.getBeaconNumber());
         assertEquals(1,rg.getBeaconNumber());
         assertEquals(2,jr.getBeaconNumber());
+
+        kb.resetBeconNumbers();
+        assertEquals(-1,kb.getBeaconNumber());
+        assertEquals(-1,jl.getBeaconNumber());
+        assertEquals(-1,rg.getBeaconNumber());
+        assertEquals(-1,jr.getBeaconNumber());
 
         GraphNode.printPathToBacon(kb);
         GraphNode.printPathToBacon(jl);
