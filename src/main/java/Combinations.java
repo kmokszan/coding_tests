@@ -16,25 +16,21 @@ public class Combinations {
      */
     public static void combineWithCollection(String str){
         if(!Strings.isNullOrEmpty(str)){
-            combineIter(new StringBuilder(str)).forEach(i-> System.out.println(i));
+            List<String> list = new LinkedList<>();
+            combineIter(new StringBuilder(str),list);
+            list.forEach(i-> System.out.println(i));
         }
     }
 
-    private static List<String> combineIter(StringBuilder str){
+    private static void combineIter(StringBuilder str, List<String> acc){
         if(str.length()==1){
-            List<String> a = new ArrayList<>();
-            a.add(str.toString());
-            return a;
+            acc.add(str.toString());
         }else{
-            List<String> a = new ArrayList<>();
             char lastLetter = str.charAt(str.length()-1);
-            a.add(lastLetter+"");
-            StringBuilder sb = str;
-            sb.setLength(sb.length()-1);
-            List<String> previousIter = combineIter(sb);
-            a.addAll(previousIter.stream().map(i->lastLetter+i).collect(Collectors.toSet()));
-            a.addAll(previousIter);
-            return a;
+            str.setLength(str.length()-1);
+            combineIter(str, acc);
+            acc.addAll(acc.stream().map(i->lastLetter+i).collect(Collectors.toSet()));
+            acc.add(lastLetter+"");
         }
     }
 
@@ -95,6 +91,41 @@ public class Combinations {
         }
     }
 
+    private static class Arg{
+        public StringBuilder prefix = new StringBuilder();
+        public int index = 0;
+    }
+
+    /**
+     * Task:
+     * For a given phoneNumber, this method prints all combinations of associated letters to each number according to existing dictionary
+     * If a given list of number includes a null value or an unmapped integer, throw IllegalArgumentException
+     * Dont use recursion
+     * @param phoneNumber
+     */
+    public static void phoneNumberToLettersNonRecursive(List<Integer> phoneNumber){
+        LinkedList<Arg> stack = new LinkedList<>();
+        Arg a = new Arg();
+        a.index = 0;
+        a.prefix = new StringBuilder();
+        stack.addFirst(a);
+        while(!stack.isEmpty()){
+            Arg current = stack.removeFirst();
+            if(phoneNumber.size()==(current.index+1)){
+                getMappedChars(phoneNumber,current.index).forEach(i->System.out.println(String.format("%s%s",current.prefix, i)));
+            }else{
+                getMappedChars(phoneNumber, current.index).forEach(i->{
+                    Arg next = new Arg();
+                    next.index = current.index + 1;
+                    next.prefix = new StringBuilder(current.prefix);
+                    next.prefix.append(i);
+                    stack.addFirst(next);
+                });
+            }
+        }
+
+    }
+
     private static List<String> getMappedChars(List<Integer> phoneNumber, int index) {
         Integer number = phoneNumber.get(index);
         if(number==null)throw new IllegalArgumentException(String.format("number at index %d was null",index));
@@ -105,8 +136,6 @@ public class Combinations {
 
 
     public static void main(String[] args) {
-        combineWithCollection("abc");
-        System.out.println("--------------");
         combine("abc");
         System.out.println("--------------");
         try{
@@ -122,5 +151,9 @@ public class Combinations {
         }
         System.out.println("--------------");
         phoneNumberToLetters(Arrays.asList(1,2,3));
+        System.out.println("--------------");
+        phoneNumberToLettersNonRecursive(Arrays.asList(1,2,3));
+        System.out.println("--------------");
+        combineWithCollection("abc");
     }
 }
