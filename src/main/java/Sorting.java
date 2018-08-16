@@ -1,7 +1,7 @@
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.stream.Stream;
 
 public class Sorting {
 
@@ -53,8 +53,8 @@ public class Sorting {
         linkedList = new LinkedList<>(Arrays.asList(4,1,3));
         stableSelectionSort(linkedList);
         int[] actual = linkedList.stream().mapToInt(Integer::intValue).toArray();
-        int[] expected = Arrays.asList(1,3,4).stream().mapToInt(Integer::intValue).toArray();
-        assert Arrays.equals(actual,expected) == true;
+        int[] expected = Stream.of(1,3,4).mapToInt(Integer::intValue).toArray();
+        assert Arrays.equals(actual, expected);
 
         linkedList = new LinkedList<>(Arrays.asList(1,1,1));
         assert findAndDeleteMinimum(linkedList,0) == 1;
@@ -63,7 +63,7 @@ public class Sorting {
         linkedList = new LinkedList<>(Arrays.asList(1,1,1));
         stableSelectionSort(linkedList);
         actual = linkedList.stream().mapToInt(Integer::intValue).toArray();
-        expected = Arrays.asList(1,1,1).stream().mapToInt(Integer::intValue).toArray();
-        assert Arrays.equals(actual,expected) == true;
+        expected = Stream.of(1,1,1).mapToInt(Integer::intValue).toArray();
+        assert Arrays.equals(actual,expected);
     }
 }
